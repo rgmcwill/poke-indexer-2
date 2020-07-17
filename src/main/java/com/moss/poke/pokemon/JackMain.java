@@ -1,4 +1,4 @@
-package com.moss.poke;
+package com.moss.poke.pokemon;
 
 public class JackMain 
 {

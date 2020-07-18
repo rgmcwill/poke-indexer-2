@@ -23,6 +23,11 @@ public class Type
         this.name = name;
     }
 
+    public HashMap<String,Integer> getEffectiveness()
+    {
+        return this.effectiveness;
+    }
+
     public int against(String typeName)
     {
         return effectiveness.get(typeName);

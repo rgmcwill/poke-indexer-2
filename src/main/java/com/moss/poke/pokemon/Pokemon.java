@@ -73,6 +73,11 @@ public class Pokemon
         this.type_2 = type_2;
     }
 
+    public Ability[] getAbilities()
+    {
+        return abilities;
+    }
+
     public Ability getAbility(int n) {
         return this.abilities[n];
     }

@@ -1,6 +1,6 @@
 package com.moss.poke.scraper;
 
-import java.io.File;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,59 +9,89 @@ import org.jsoup.select.Elements;
 
 public class PokeFromSite extends GetPage {
 
-    String pokemon;
+    private String pokemon;
+    private Element pokeTable;
 
-    public PokeFromSite(String searchUrl, String pokemon) {
-        super(searchUrl);
+    public PokeFromSite(String pokemon) throws Exception {
+        super("https://bulbapedia.bulbagarden.net/wiki/" + URLEncoder.encode((pokemon.replace(" ", "_")), "UTF-8") + "_(Pok%C3%A9mon)");
         this.pokemon = pokemon;
-        scrapeHtml();
+
+        getBaseComponents();
     }
 
-    private void scrapeHtml() {
+    private void getBaseComponents() {
         // System.out.println(page.getByXPath("//span[@class='mw-headline']"));
         Element mainSection = super.page.select("html body div#globalWrapper div#column-content div#content div#outercontentbox div#bodyContent div#mw-content-text").first();
-        Element pokeTable = mainSection.child(1);
-
-        System.out.println(getTypes(pokeTable));
-        System.out.println(getAbilities(pokeTable));
-        System.out.println(getGenderRatio(pokeTable));
-        System.out.println(getCatchRate(pokeTable));
-        System.out.println(getEggGroup(pokeTable));
-        System.out.println(getHatchTime(pokeTable));
-        System.out.println(getHeight(pokeTable));
-        System.out.println(getWeight(pokeTable));
-        System.out.println(getBaseExpYield(pokeTable));
-        System.out.println(getLevelingRate(pokeTable));
-        // System.out.println(getEVYield(pokeTable));
-        // System.out.println(getDexColor(pokeTable));
-        // System.out.println(getBaseFriendship(pokeTable));
+        // Element pokeTable = mainSection.child(1);
+        this.pokeTable = mainSection.children().select("table.roundy").first();
 
         // TODO:
         // Remove array index from xpaths and replace with classes, ids and others
         // Break down the 2 FromSite classes with 'interfaces'
     }
 
-    private Object getBaseFriendship(Element table) {
+    public String getPokemon() {
+        return this.pokemon;
+    }
+
+    public Integer getDexNumb() {
+        Element dexNumbHeader = this.pokeTable.select("a[title*=List of Pokémon by National Pokédex number]").first();
+        String dexNumb = dexNumbHeader.select("span").first().ownText();
+
+        String dexNumbString = dexNumb.replaceAll("\\D+","");
+
+        if (dexNumbString.length() != 0)
+            return Integer.parseInt(dexNumbString);
+
         return null;
     }
 
-    private Object getDexColor(Element table) {
+    public Integer getBaseFriendship() {
+        Element baseFriendshipHeader = this.pokeTable.select("a[title*=List of Pokémon by base friendship]").first();
+        String baseFriendship = baseFriendshipHeader.parent().parent().select("table tr td").first().ownText();
+
+        if (!baseFriendship.equals("Unknown"))
+            return Integer.parseInt(baseFriendship);
         return null;
     }
 
-    private Object getEVYield(Element table) {
-        return null;
+    public String getDexColor() {
+        Element dexColorHeader = this.pokeTable.select("a[title*=List of Pokémon by color]").first();
+        String dexColor = dexColorHeader.parent().parent().select("table tr td").first().ownText();
+
+        return dexColor;
     }
 
-    private String getLevelingRate(Element table) {
-        Element levelingRateHeader = table.select("a[title*=Experience]").first();
+    public List<Integer> getEVYield() {
+        Element evYieldHeader = this.pokeTable.select("a[title*=List of Pokémon by effort value yield]").first();
+        Elements evYieldSet = evYieldHeader.parent().parent().select("table tr").get(2).select("td");
+
+        List<Integer> evYield = new ArrayList<>(6);
+        // System.out.println(evYieldSet.text());
+
+        try {
+            for (Element e : evYieldSet) {
+                if (!e.ownText().isEmpty())
+                    evYield.add(Integer.parseInt(e.ownText()));
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        if (evYield.isEmpty())
+            return null;
+        return evYield;
+    }
+
+    public String getLevelingRate() {
+        Element levelingRateHeader = this.pokeTable.select("a[title*=Experience]").get(1);
         Element levelingRate = levelingRateHeader.parent().parent().select("table tr td").first();
 
         return levelingRate.ownText();
 	}
 
-	private List<Integer> getBaseExpYield(Element table) {
-        Element baseExpYieldHeader = table.select("a[title*=Experience]").first();
+	public List<Integer> getBaseExpYield() {
+        Element baseExpYieldHeader = this.pokeTable.select("a[title*=Experience]").first();
         Elements baseExpYieldSet = baseExpYieldHeader.parent().parent().select("table tr td");
 
         List<Integer> baseExpYields = new ArrayList<>();
@@ -74,8 +104,8 @@ public class PokeFromSite extends GetPage {
         return baseExpYields;
     }
 
-    private Double getWeight(Element table) {
-        Element weightHeader = table.select("a[title*=Weight]").first();
+    public Double getWeight() {
+        Element weightHeader = this.pokeTable.select("a[title*=Weight]").first();
         Elements weightSet = weightHeader.parent().parent().select("table tr td");
 
         for (Element e : weightSet) {
@@ -87,8 +117,8 @@ public class PokeFromSite extends GetPage {
         return null;
     }
 
-    private Double getHeight(Element table) {
-        Element heightHeader = table.select("a[title*=List of Pokémon by height]").first();
+    public Double getHeight() {
+        Element heightHeader = this.pokeTable.select("a[title*=List of Pokémon by height]").first();
         Elements heightSet = heightHeader.parent().parent().select("table tr td");
 
         for (Element e : heightSet) {
@@ -100,15 +130,19 @@ public class PokeFromSite extends GetPage {
         return null;
     }
 
-    private Integer getHatchTime(Element table) {
-        Element hatchTimeHeader = table.select("a[title*=Egg cycle]").first();
+    public Integer getHatchTime() {
+        Element hatchTimeHeader = this.pokeTable.select("a[title*=Egg cycle]").first();
         Elements hatchTimeSet = hatchTimeHeader.parent().parent().select("table tr td");
 
-        return Integer.parseInt(hatchTimeSet.text().split(" - ")[1].replaceAll("\\D+",""));
+        String[] splitHatchTimes = hatchTimeSet.text().split(" - ");
+
+        if (splitHatchTimes.length > 1)
+            return Integer.parseInt(hatchTimeSet.text().split(" - ")[1].replaceAll("\\D+",""));
+        return null;
     }
 
-    private List<String> getEggGroup(Element table) {
-        Element eggGroupsHeader = table.select("a[title*=Egg Group]").first();
+    public List<String> getEggGroup() {
+        Element eggGroupsHeader = this.pokeTable.select("a[title*=Egg Group]").first();
         Elements eggGroupsSet = eggGroupsHeader.parent().parent().select("table tr td a[title*=(Egg Group)] span");
 
         List<String> eggGroups = new ArrayList<>();
@@ -119,15 +153,19 @@ public class PokeFromSite extends GetPage {
         return eggGroups;
     }
 
-    private Integer getCatchRate(Element table) {
-        Element catchRateHeader = table.select("a[title*=Catch rate]").first();
+    public Integer getCatchRate() {
+        Element catchRateHeader = this.pokeTable.select("a[title*=Catch rate]").first();
         Elements catchRateSet = catchRateHeader.parent().parent().select("table tr td");
 
-        return Integer.parseInt(catchRateSet.text().split(" ")[0]);
+        String catchRate = catchRateSet.text().split(" ")[0];
+
+        if (!catchRate.equals("Unknown"))
+            return Integer.parseInt(catchRate);
+        return null;
     }
 
-    private Double getGenderRatio(Element table) {
-        Element genderRatioHeader = table.select("a[title*=List of Pokémon by gender ratio]").first();
+    public Double getGenderRatio() {
+        Element genderRatioHeader = this.pokeTable.select("a[title*=List of Pokémon by gender ratio]").first();
         Elements genderRatioSet = genderRatioHeader.parent().parent().select("table tr span");
 
         for (Element e : genderRatioSet) {
@@ -140,8 +178,8 @@ public class PokeFromSite extends GetPage {
         return null;
     }
 
-    private List<List<String>> getAbilities(Element table) {
-        Elements abilitySets = table.select("tbody tr td.roundy table.roundy tbody tr a[href*=(Ability)]");
+    public List<List<String>> getAbilities() {
+        Elements abilitySets = this.pokeTable.select("tbody tr td.roundy table.roundy tbody tr a[href*=(Ability)]");
 
         List<String> abilities = new ArrayList<>();
         List<String> hiddenAbilities = new ArrayList<>();
@@ -165,14 +203,16 @@ public class PokeFromSite extends GetPage {
     }
 
 
-    private List<String> getTypes(Element table) {
-        Elements typeSets = table.select("tbody tr td.roundy table.roundy tbody tr tr");
-
+    public List<String> getTypes() {
+        Element typeHeader = this.pokeTable.select("a[title=Type]").first();
+        Element typeTable = typeHeader.parent().parent().select("table tbody tr td").get(0);
+        // System.out.println(typeTable);
+        Elements typeSet = typeTable.select("b");
+        
         List<String> types = new ArrayList<>();
-        Elements firstTypeSet = typeSets.first().select("td");
 
-        for (Element type : firstTypeSet) {
-            String t = type.text();
+        for (Element type : typeSet) {
+            String t = type.ownText();
             // System.out.println("-"+t+"-");
             if (!t.equals("Unknown"))
                 types.add(t);

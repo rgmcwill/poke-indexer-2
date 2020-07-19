@@ -16,20 +16,49 @@ public class App
         List<String> allPoke = allPokeFromSite.getAllPokemon();
         System.out.println(allPoke);
 
-        String pokemon = allPoke.get((int) (Math.random() * (allPoke.size() - 0)) + 0);
-        pokemon = "Charizard";
-        System.out.println("------"+pokemon+"------");
+        // String pokemon = allPoke.get((int) (Math.random() * (allPoke.size() - 0)) + 0);
+        // pokemon = "Tapu Lele";
+        // pokemon = "Mr. Mime";
 
-        String siteUrl = null;
+        PokeFromSite poke = null;
 
-        try {
-            siteUrl = "https://bulbapedia.bulbagarden.net/wiki/" + URLEncoder.encode((pokemon), "UTF-8") + "_(Pok%C3%A9mon)";
-        }catch(Exception e){
-            e.printStackTrace();
+        for (String p : allPoke) {
+            try {
+                poke = new PokeFromSite(p);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.print(poke.getPokemon());
+            System.out.print(" | ");
+            System.out.print(poke.getDexNumb());
+            System.out.print(" | ");
+            System.out.print(poke.getTypes());
+            System.out.print(" | ");
+            System.out.print(poke.getAbilities());
+            System.out.print(" | ");
+            System.out.print(poke.getGenderRatio());
+            System.out.print(" | ");
+            System.out.print(poke.getCatchRate());
+            System.out.print(" | ");
+            System.out.print(poke.getEggGroup());
+            System.out.print(" | ");
+            System.out.print(poke.getHatchTime());
+            System.out.print(" | ");
+            System.out.print(poke.getHeight());
+            System.out.print(" | ");
+            System.out.print(poke.getWeight());
+            System.out.print(" | ");
+            System.out.print(poke.getBaseExpYield());
+            System.out.print(" | ");
+            System.out.print(poke.getLevelingRate());
+            System.out.print(" | ");
+            System.out.print(poke.getEVYield());
+            System.out.print(" | ");
+            System.out.print(poke.getDexColor());
+            System.out.print(" | ");
+            System.out.print(poke.getBaseFriendship());
+            System.out.println("");
         }
-
-        PokeFromSite poke = new PokeFromSite(siteUrl, pokemon);
-
-
     }
 }

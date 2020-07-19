@@ -21,9 +21,12 @@ public class GetPage {
         try {
             if (file.exists()) {
                 System.out.println("Cached");
+                System.out.println(this.file);
                 this.page = Jsoup.parse(this.file, "UTF-8", searchUrl);
             } else {
                 System.out.println("Downloaded");
+                System.out.println(this.file);
+                System.out.println(searchUrl);
                 this.page = Jsoup.connect(searchUrl).get();
                 docWriter();
             }
@@ -33,6 +36,7 @@ public class GetPage {
     }
 
     private File docWriter() {
+        System.out.println("docWriter");
         BufferedWriter  writer = null;
         try {
             this.file.createNewFile();

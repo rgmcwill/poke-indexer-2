@@ -2,6 +2,7 @@ package com.moss.poke;
 
 import java.io.File;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.moss.poke.scraper.AllPokeFromSite;
@@ -19,6 +20,21 @@ public class App
         // String pokemon = allPoke.get((int) (Math.random() * (allPoke.size() - 0)) + 0);
         // pokemon = "Tapu Lele";
         // pokemon = "Mr. Mime";
+
+        allPoke = new ArrayList<>();
+        allPoke.add("Tapu Lele");
+        allPoke.add("Mr. Mime");
+        allPoke.add("Mime Jr.");
+        allPoke.add("Grapploct");
+        allPoke.add("Calyrex");
+        allPoke.add("Regieleki");
+        allPoke.add("Regidrago");
+        allPoke.add("Oddish");
+        allPoke.add("Gloom");
+        // allPoke.add("Eevee");
+        allPoke.add("Urshifu");
+        allPoke.add("Wurmple");
+        allPoke.add("Tyrogue");
 
         PokeFromSite poke = null;
 
@@ -58,6 +74,8 @@ public class App
             System.out.print(poke.getDexColor());
             System.out.print(" | ");
             System.out.print(poke.getBaseFriendship());
+            System.out.print(" | ");
+            System.out.print(poke.getNextEvo());
             System.out.println("");
         }
     }

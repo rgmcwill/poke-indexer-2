@@ -3,10 +3,13 @@ package com.moss.poke;
 import java.io.File;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.moss.poke.scraper.AllPokeFromSite;
 import com.moss.poke.scraper.PokeFromSite;
+
+import org.json.simple.JSONObject;
 
 public class App 
 {
@@ -22,19 +25,19 @@ public class App
         // pokemon = "Mr. Mime";
 
         allPoke = new ArrayList<>();
-        allPoke.add("Tapu Lele");
-        allPoke.add("Mr. Mime");
-        allPoke.add("Mime Jr.");
-        allPoke.add("Grapploct");
-        allPoke.add("Calyrex");
-        allPoke.add("Regieleki");
-        allPoke.add("Regidrago");
-        allPoke.add("Oddish");
-        allPoke.add("Gloom");
+        // allPoke.add("Tapu Lele");
+        // allPoke.add("Mr. Mime");
+        // allPoke.add("Mime Jr.");
+        // allPoke.add("Grapploct");
+        // allPoke.add("Calyrex");
+        // allPoke.add("Regieleki");
+        // allPoke.add("Regidrago");
+        // allPoke.add("Oddish");
+        // allPoke.add("Gloom");
         // allPoke.add("Eevee");
-        allPoke.add("Urshifu");
-        allPoke.add("Wurmple");
-        allPoke.add("Tyrogue");
+        // allPoke.add("Urshifu");
+        // allPoke.add("Wurmple");
+        // allPoke.add("Tyrogue");
 
         PokeFromSite poke = null;
 
@@ -78,5 +81,22 @@ public class App
             System.out.print(poke.getNextEvo());
             System.out.println("");
         }
+
+        // Pokemon a = new Pokemon();
+        // a.setName("Kingler");
+        // a.setAdj("Pincer");
+        
+        // System.out.println(a.getName());
+        // System.out.println(a.getAdj());
+
+        JSONObject obj = new JSONObject();
+        // JSONObject b = new JSONObject();
+        // b.put("number",4);
+        ArrayList b = new ArrayList();
+        b.add("Hello");
+        b.add(1);
+        b.add("1");
+        obj.put("name",b);
+        System.out.println(obj);
     }
 }

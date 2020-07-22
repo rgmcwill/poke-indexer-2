@@ -1,207 +1,177 @@
 package com.moss.poke.pokemon;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Pokemon
 {
-    String name;
-    String adj;
+    private HashMap<String, Object> poke = new LinkedHashMap<>();
 
-    Type type_1;
-    Type type_2;
-
-    Ability[] abilities;
-
-    ArrayList<Pokemon> evolutions;
-
-    int catchRate;
-
-    float maleRatio;
-    float femaleRatio;// won't have a setter
-
-    int hatchingSteps;//the max of the two numbers
-
-    float height;
-    float weight;
-
-    int oldExpYield;
-    int newExpYield;
-
-    int levelingRate;//0-5 Fluctuating, slow, medium slow, medium fast, eradic
-
-    int[] EVYield;
-
-    int baseFriendship;
-
-    public Pokemon()
-    {
-        abilities = new Ability[3];
-        evolutions = new ArrayList<>();
-        EVYield = new int[6];
+    public Pokemon() {
     }
 
+    public HashMap toHaspMap() {
+        return poke;
+    }
 
-    public String getName() {
-        return this.name;
+    public Object getName() {
+        return poke.get("name");
     }
 
     public void setName(String name) {
-        this.name = name;
+        poke.put("name", name);
     }
 
-    public String getAdj() {
-        return this.adj;
+    public Object getDexNumber() {
+        return poke.get("dexNumber");
+    }
+
+    public void setDexNumber(Integer dexNumber) {
+        poke.put("dexNumber", dexNumber);
+    }
+
+    public Object getAdj() {
+        return poke.get("adj");
     }
 
     public void setAdj(String adj) {
-        this.adj = adj;
+        poke.put("adj", adj);
     }
 
-    public Type getType_1() {
-        return this.type_1;
+    public Object getTypes() {
+        return poke.get("types");
     }
 
-    public void setType_1(Type type_1) {
-        this.type_1 = type_1;
+    public void setTypes(List<String> types) {
+        poke.put("types", types);
     }
 
-    public Type getType_2() {
-        return this.type_2;
+    public Object getAbilities() {
+        return poke.get("abilities");
     }
 
-    public void setType_2(Type type_2) {
-        this.type_2 = type_2;
-    }
+    public void setAbilities(List<List<String>> allAbilities) {
+        HashMap<String, Object> abilities = new LinkedHashMap<>();
+        abilities.put("abilities", allAbilities.get(0));
+        abilities.put("hiddenAbilities", allAbilities.get(1));
 
-    public Ability[] getAbilities()
-    {
-        return abilities;
-    }
-
-    public Ability getAbility(int n) {
-        return this.abilities[n];
-    }
-
-    public void setAbility(int n, Ability ability) {
-        this.abilities[n] = ability;
+        poke.put("abilities", abilities);
     }
 
     //Methods for both full editing and getting as well as adding and reading indvidual
-    public ArrayList<Pokemon> getEvolutions() {
-        return this.evolutions;
+    public Object getEvolutions() {
+        return poke.get("evolutions");
     }
 
-    public Pokemon getEvolution(int n)
-    {
-        return this.evolutions.get(n);
+    public void setEvolutions(List<String> evolutions) {
+        poke.put("evolutions", evolutions);
     }
 
-    public void addEvolution(Pokemon pokemon) {
-        this.evolutions.add(pokemon);
+    public Object getEggGroup() {
+        return poke.get("eggGroup");
     }
 
-    public int getCatchRate() {
-        return this.catchRate;
+    public void setEggGroup(List<String> eggGroup) {
+        poke.put("eggGroup", eggGroup);
     }
 
-    public void setCatchRate(int catchRate) {
-        this.catchRate = catchRate;
+    public Object getCatchRate() {
+        return poke.get("catchRate");
     }
 
-    public float getMaleRatio() {
-        return this.maleRatio;
+    public void setCatchRate(Integer catchRate) {
+        poke.put("catchRate", catchRate);
     }
 
-    public void setMaleRatio(float maleRatio) {
-        this.maleRatio = maleRatio;
-        this.femaleRatio = 100-maleRatio;
+    public Object getMaleRatio() {
+        return poke.get("maleRatio");
     }
-    
-    //Automaticly detirmind off of maleRatio
-    public float getFemaleRatio()
-    {
-        return this.femaleRatio;
+
+    public Object getFemaleRatio() {
+        return poke.get("femaleRatio");
+    }
+
+    public void setMaleRatio(Double maleRatio) {
+        if (maleRatio != null) {
+            poke.put("maleRatio", maleRatio);
+            poke.put("femaleRatio", 100 - maleRatio);
+        }
     }
 
     //Maximum of the range
-    public int getHatchingSteps() {
-        return this.hatchingSteps;
+    public Object getHatchingSteps() {
+        return poke.get("hatchingSteps");
     }
 
-    public void setHatchingSteps(int hatchingSteps) {
-        this.hatchingSteps = hatchingSteps;
+    public void setHatchingSteps(Integer hatchingSteps) {
+        poke.put("hatchingSteps", hatchingSteps);
     }
 
-    public float getHeight() {
-        return this.height;
+    public Object getHeight() {
+        return poke.get("height");
     }
 
-    public void setHeight(float height) {
-        this.height = height;
+    public void setHeight(Double height) {
+        poke.put("height", height);
     }
 
-    public float getWeight() {
-        return this.weight;
+    public Object getWeight() {
+        return poke.get("weight");
     }
 
-    public void setWeight(float weight) {
-        this.weight = weight;
+    public void setWeight(Double weight) {
+        poke.put("weight", weight);
     }
 
     //Null if V+
-    public int getOldExpYield() {
-        return this.oldExpYield;
-    }
+    // public int getOldExpYield() {
+    //     return this.oldExpYield;
+    // }
 
-    public void setOldExpYield(int oldExpYield) {
-        this.oldExpYield = oldExpYield;
-    }
+    // public void setOldExpYield(int oldExpYield) {
+    //     this.oldExpYield = oldExpYield;
+    // }
 
     //Use if V+
-    public int getNewExpYield() {
-        return this.newExpYield;
+    public Object getExpYield() {
+        return poke.get("expYield");
     }
 
-    public void setNewExpYield(int newExpYield) {
-        this.newExpYield = newExpYield;
+    public void setExpYield(List<Integer> expYield) {
+        poke.put("expYield", expYield);
     }
 
-    public int getLevelingRate() {
-        return this.levelingRate;
+    public Object getLevelingRate() {
+        return poke.get("levelingRate");
     }
 
-    //0-Fluctuating, 1-Slow, 2-Medium Slow, 3-Medium Fast, 4-Fast, 5-Erratic
-    public void setLevelingRate(int levelingRate) {
-        this.levelingRate = levelingRate;
+    //0-Fluctuating, 1-Slow, 2-Medium Slow, 3-Medium Fast, 4-Fast, 5-Erratic Maybe
+    public void setLevelingRate(String levelingRate) {
+        poke.put("levelingRate", levelingRate);
     }
 
-    public int[] getEVYield() {
-        return this.EVYield;
+    public Object getEVYield() {
+        return poke.get("evYield");
     }
 
-    //0-Hp, 1-Atk, 2-Def, 3-Sp. Atk, 4-Sp. Def, 5-Speed
-    public int getEVYeild(int n)
-    {
-        return this.EVYield[n];
+    public void setEVYield(List<Integer> EVYield) {
+        poke.put("evYield", EVYield);
     }
 
-    public void setEVYield(int[] EVYield) {
-        this.EVYield = EVYield;
+    public Object getBaseFriendship() {
+        return poke.get("baseFriendship");
     }
 
-    //0-Hp, 1-Atk, 2-Def, 3-Sp. Atk, 4-Sp. Def, 5-Speed
-    public void setEVYield(int n, int EV)
-    {
-        this.EVYield[n] = EV;
+    public void setBaseFriendship(Integer baseFriendship) {
+        poke.put("baseFriendship", baseFriendship);
     }
 
-    public int getBaseFriendship()
-    {
-        return this.baseFriendship;
+    public Object getDexColor() {
+        return poke.get("dexColor");
     }
 
-    public void setBaseFriendship(int baseFriendship)
-    {
-        this.baseFriendship = baseFriendship;
+    public void setDexColor(String dexColor) {
+        poke.put("dexColor", dexColor);
     }
 }

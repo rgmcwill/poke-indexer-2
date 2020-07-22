@@ -39,7 +39,7 @@ public class PokeFromSite extends GetPage {
         // Break down the 2 FromSite classes with 'interfaces'
     }
 
-    public Set<String> getNextEvo() {
+    public List<String> getNextEvo() {
         if (this.pokeEvoTable ==  null)
             return null;
         Elements evoRows = pokeEvoTable.select("tbody").first().children();
@@ -89,7 +89,7 @@ public class PokeFromSite extends GetPage {
             }
         }
 
-        return nextPokeEvo;
+        return new ArrayList<>(nextPokeEvo);
     }
 
     //Should be given a 'td' html element
@@ -146,6 +146,8 @@ public class PokeFromSite extends GetPage {
     public String getDexColor() {
         Element dexColorHeader = this.pokeTable.select("a[title*=List of Pokémon by color]").first();
         String dexColor = dexColorHeader.parent().parent().select("table tr td").first().ownText();
+        if (dexColor.equals("Unknown"))
+            return null;
 
         return dexColor;
     }
@@ -173,9 +175,11 @@ public class PokeFromSite extends GetPage {
 
     public String getLevelingRate() {
         Element levelingRateHeader = this.pokeTable.select("a[title*=Experience]").get(1);
-        Element levelingRate = levelingRateHeader.parent().parent().select("table tr td").first();
+        String levelingRate = levelingRateHeader.parent().parent().select("table tr td").first().ownText();
+        if (levelingRate.equals("Unknown"))
+            return null;
 
-        return levelingRate.ownText();
+        return levelingRate;
 	}
 
 	public List<Integer> getBaseExpYield() {

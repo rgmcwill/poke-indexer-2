@@ -1,7 +1,9 @@
 package com.moss.poke.scraper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -9,7 +11,7 @@ import org.jsoup.select.Elements;
 
 public class AllPokeFromSite extends GetPage {
 
-    private List<String> allPokemon = new ArrayList<>();
+    private Set<String> allPokemon = new HashSet<>();
 
     public AllPokeFromSite(String searchUrl) {
         super(searchUrl);
@@ -75,6 +77,6 @@ public class AllPokeFromSite extends GetPage {
     }
 
     public List<String> getAllPokemon() {
-        return this.allPokemon;
+        return new ArrayList<>(this.allPokemon);
     }
 }

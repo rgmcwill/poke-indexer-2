@@ -1,7 +1,11 @@
 package com.moss.poke.pokemon;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 public class Ability 
 {
+    private HashMap<String, Object> abil = new LinkedHashMap<>();
     String name;
     String desc;
 

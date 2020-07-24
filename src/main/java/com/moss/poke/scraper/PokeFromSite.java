@@ -2,9 +2,14 @@ package com.moss.poke.scraper;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -40,56 +45,176 @@ public class PokeFromSite extends GetPage {
     }
 
     public Set<String> getNextEvo() {
+        //No evoTable due to not existing (Usally because of its a new pokemon)
         if (this.pokeEvoTable ==  null)
             return null;
+        
+        //Gets the rows from the table
         Elements evoRows = pokeEvoTable.select("tbody").first().children();
 
-        if (evoRows.first().children().size() == 1)
+        //If the pokemon has no evolutions
+        if (evoRows.first().children().size() == 1 && evoRows.size() == 1)
             return null;
 
-        // System.out.println("numb of cols: " + evoRows.size());
-        List<List<Element>> evoLinesCols = new ArrayList<>(evoRows.size());
+        Element maxRow = getMaxRow(evoRows);
+        int maxRowIndex = evoRows.indexOf(maxRow);
 
-        //Init list
+        //Will transpose table if the max col is not first
+        if (maxRowIndex != 0)
+            evoRows = transposeTable(evoRows);
+
+        //A list of lists which will each contian each bit of table data
+        List<List<Element>> finalList = new ArrayList<>();
+
+        //Inits finalList
         for (int i = 0; i < evoRows.size(); i++) {
-            List<Element> al = new ArrayList<>();
-            evoLinesCols.add(al);
+            // System.out.println("Initing Arrays " + i);
+            finalList.add(new ArrayList<Element>());
         }
 
-        for (int i = 1; i < evoRows.size() + 1; i++) {
-            Element row = evoRows.get(i-1);
-            List<Element> mainList = evoLinesCols.get(i-1);
-            for (int k = 0; k < row.children().size(); k++) {
-                Element col = row.children().get(k);
-                String s = col.attr("rowspan");
-                if (s != "" && evoRows.size() != 1) {
-                    Integer rowSpanNumb = Integer.parseInt(s);
-                    for (int j = i+1; j < rowSpanNumb+1; j++) {
-                        List<Element> curEvoColList = evoLinesCols.get(j-1);
-                        for (int l = k; l < row.children().size() && isTablePoke(row.children().get(l)); l++) {
-                            // System.out.println(row.children().get(l).text());
-                            if (isTablePoke(row.children().get(l))) {
-                                curEvoColList.add(row.children().get(l));
-                            }
-                        }
-                    }
+        //First pass for first row to span the rowspan across the lists
+        Element firstRow = evoRows.first();
+        for (Element tableData : firstRow.children()) {
+            //Gets the numb of rowspan
+            String rowspanString = tableData.attr("rowspan");
+            Integer rowspanValue = null;
+            if (rowspanString != "")
+                rowspanValue = Integer.parseInt(rowspanString);
+            //checks if the rowspan attr has a value or number in it.
+            if (rowspanValue != null && (rowspanValue > 1 && rowspanValue <= evoRows.size())) {
+                for (int finalListIndex = 0; finalListIndex < rowspanValue; finalListIndex++) {
+                    List<Element> currEvoLine = finalList.get(finalListIndex);
+                    currEvoLine.add(tableData);
                 }
-                if (isTablePoke(col))
-                    mainList.add(col);
+            } else {
+                List<Element> firstEvoLine = finalList.get(0);
+                firstEvoLine.add(tableData);
             }
         }
 
-        Set<String> nextPokeEvo = new HashSet<>();
-
-        for (List<Element> al : evoLinesCols) {
-            for (int i = 0; i < al.size(); i++) {
-                Element e = al.get(i);
-                if (e.select("tbody tr").last().select("span").first().ownText().equals(this.pokemon) && i+1 < al.size())
-                    nextPokeEvo.add(al.get(i+1).select("tbody tr").last().select("span").first().ownText());
+        //Adds the remaining rows to the finalList
+        for (int i = 1 ; i < evoRows.size(); i++) {
+            Element row = evoRows.get(i);
+            for (Element tableData : row.children()) {
+                List<Element> listAtRowIndex = finalList.get(i);
+                listAtRowIndex.add(tableData);
             }
         }
 
-        return nextPokeEvo;
+        for (List<Element> e : finalList) {
+            for (Element f : e) {
+                if (isTablePoke(f))
+                    System.out.print(getNameFromtd(f) + " | ");
+                else {
+                    getEvoRequirments(f);
+                    // System.out.print(f.text() + " | ");
+                }
+            }
+            System.out.println("");
+        }
+
+        // System.out.println(evoRows.html());
+
+        return null;
+    }
+
+    //Get pokemon name from tableData
+    private String getNameFromtd(Element td) {
+        return td.select("tbody tr").last().select("span").first().ownText();
+    }
+
+    //Gets Evo requirments from tableData in a ArrayList [Level, Item Name, Descritption]
+    private ArrayList<String> getEvoRequirments(Element td) {
+        ArrayList<String> finalList = new ArrayList<>();
+
+        //Get Level if applicable
+        Elements level = td.select("a[title*=Level]");
+        if (level.size() > 0) {
+            finalList.add(0, level.first().text());
+            System.out.print(level.first().text() + " | ");
+        } else if (td.ownText().contains("Level")) {
+            Pattern p = Pattern.compile("(?=((Level )([0-9]{1,2})))");
+            Matcher matcher = p.matcher(td.ownText());
+            matcher.find();
+            String test = matcher.group(1);
+            System.out.print(test + " | ");
+        }
+
+        HashMap<String, Integer> counting = new HashMap<>();
+
+        //Get items if applicable
+        for (Element e : td.children()) {
+            if (e.attr("title") != "") {
+                String s = e.attr("title");
+                if (counting.get(s) != null) {
+                    Integer i = counting.get(s);
+                    counting.put(s, i+1);
+                } else {
+                    counting.put(s, 1);
+                }
+            }
+        }
+
+        Map.Entry<String, Integer> maxEntry = null;
+        for (Map.Entry<String, Integer> e : counting.entrySet()) {
+            if (maxEntry == null || e.getValue().compareTo(maxEntry.getValue()) > 0) {
+                maxEntry = e;
+            }
+        }
+
+        Map<String, Integer> allMax = new HashMap<>();
+        for (Map.Entry<String, Integer> e : counting.entrySet()) {
+            if (e.getValue() == maxEntry.getValue() && e.getValue() >= 2) {
+                allMax.put(e.getKey(), e.getValue());
+            }
+        }
+
+        if (maxEntry.getValue() >= 2) {
+            System.out.print(allMax + " | ");
+        }
+
+        //Get Other/description if applicable
+
+        return finalList;
+    }
+
+    //Will transpose a tbodys
+    private Elements transposeTable(Elements tableRows) {
+        int numbOfRows = getMaxRow(tableRows).children().size();
+        Elements newRows = new Elements();
+
+        for (int newRowIndex = 0; newRowIndex < numbOfRows; newRowIndex++) {
+            Element aRow = new Element("tr");
+            newRows.add(aRow);
+        }
+
+        //For Eevee there are now 8 tr instead of 3 tr
+        for (Element row : tableRows) { //goes 3 time for the inital amount of rows
+            for (int i = 0; i < row.children().size(); i++) { //goes 1 once then 8 then 8
+                Element temp = newRows.get(i);
+                Element tableData = row.children().get(i).clone();
+                if (tableData.attr("colspan") != "") {
+                    tableData.attr("rowspan", tableData.attr("colspan"));
+                    tableData.removeAttr("colspan");
+                }
+                temp.appendChild(tableData);
+            }
+        }
+
+        // newRows.html(newRows.html().replaceAll("↓", "→"));
+
+        return newRows;
+    }
+
+    //Get the Row with the most col or children
+    private Element getMaxRow(Elements tableRows) {
+        Element maxRow = tableRows.first();
+        for (Element row : tableRows) {
+            if (row.children().size() > maxRow.children().size()) {
+                maxRow = row;
+            }
+        }
+        return maxRow;
     }
 
     //Should be given a 'td' html element

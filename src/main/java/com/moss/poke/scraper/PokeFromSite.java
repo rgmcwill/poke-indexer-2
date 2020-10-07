@@ -12,6 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 public class PokeFromSite extends GetPage {
@@ -103,11 +105,10 @@ public class PokeFromSite extends GetPage {
 
         for (List<Element> e : finalList) {
             for (Element f : e) {
-                if (isTablePoke(f))
+                if (isTablePoke(f)) {
                     System.out.print(getNameFromtd(f) + " | ");
-                else {
+                } else {
                     getEvoRequirments(f);
-                    // System.out.print(f.text() + " | ");
                 }
             }
             System.out.println("");
@@ -127,55 +128,90 @@ public class PokeFromSite extends GetPage {
     private ArrayList<String> getEvoRequirments(Element td) {
         ArrayList<String> finalList = new ArrayList<>();
 
+        // System.out.print(" [ ");
+
         //Get Level if applicable
         Elements level = td.select("a[title*=Level]");
         if (level.size() > 0) {
             finalList.add(0, level.first().text());
-            System.out.print(level.first().text() + " | ");
+            // System.out.print(level.first().text() + " | ");
         } else if (td.ownText().contains("Level")) {
             Pattern p = Pattern.compile("(?=((Level )([0-9]{1,2})))");
             Matcher matcher = p.matcher(td.ownText());
             matcher.find();
             String test = matcher.group(1);
-            System.out.print(test + " | ");
+            // System.out.print(test + " | ");
         }
 
-        HashMap<String, Integer> counting = new HashMap<>();
+        // HashMap<String, Integer> counting = new HashMap<>();
 
         //Get items if applicable
-        for (Element e : td.children()) {
-            if (e.attr("title") != "") {
-                String s = e.attr("title");
-                if (counting.get(s) != null) {
-                    Integer i = counting.get(s);
-                    counting.put(s, i+1);
-                } else {
-                    counting.put(s, 1);
-                }
-            }
-        }
+        //This code currently gets
 
-        Map.Entry<String, Integer> maxEntry = null;
-        for (Map.Entry<String, Integer> e : counting.entrySet()) {
-            if (maxEntry == null || e.getValue().compareTo(maxEntry.getValue()) > 0) {
-                maxEntry = e;
-            }
-        }
+        /*[Ice Stone, Luck Incense, Razor Fang, Shiny Stone, Reaper Cloth, N-Solarizer, Odd Incense, Magmarizer,
+        TM Fairy, Upgrade, Thunder Stone, Pure Incense, Trade, Metal Coat, Water Stone, Statistic, Poké Ball,
+        Oval Stone, Whipped Dream, Leaf Stone, Electirizer, Fire Stone, Full Incense, Dusk Stone, Affection,
+        Deep Sea Scale, Tart Apple, Rock Incense, Lax Incense, Moon Stone, Dragon Scale, Razor Claw, Galar,
+        Dawn Stone, Wave Incense, King's Rock, Cracked Pot, Sea Incense, Rose Incense, Sun Stone, Deep Sea Tooth,
+        Sweet Apple, Protector, Alola]
+        */
+        // for (Element e : td.children()) {
+        //     if (e.attr("title") != "") {
+        //         String s = e.attr("title");
+        //         if (counting.get(s) != null) {
+        //             Integer i = counting.get(s);
+        //             counting.put(s, i+1);
+        //         } else {
+        //             counting.put(s, 1);
+        //         }
+        //     }
+        // }
 
-        Map<String, Integer> allMax = new HashMap<>();
-        for (Map.Entry<String, Integer> e : counting.entrySet()) {
-            if (e.getValue() == maxEntry.getValue() && e.getValue() >= 2) {
-                allMax.put(e.getKey(), e.getValue());
-            }
-        }
+        // Map.Entry<String, Integer> maxEntry = null;
+        // for (Map.Entry<String, Integer> e : counting.entrySet()) {
+        //     if (maxEntry == null || e.getValue().compareTo(maxEntry.getValue()) > 0) {
+        //         maxEntry = e;
+        //     }
+        // }
 
-        if (maxEntry.getValue() >= 2) {
-            System.out.print(allMax + " | ");
+        // Map<String, Integer> allMax = new HashMap<>();
+        // for (Map.Entry<String, Integer> e : counting.entrySet()) {
+        //     if (e.getValue() == maxEntry.getValue() && e.getValue() >= 2) {
+        //         allMax.put(e.getKey(), e.getValue());
+        //     }
+        // }
+
+        // if (maxEntry.getValue() >= 2) {
+        //     // return new ArrayList<>(allMax.keySet());
+        //     System.out.print(allMax.keySet() + " | ");
+        // }
+
+        //Trying to seperate the tableData with by the arrows and the hr tag
+        Elements currSec = new Elements();
+        // System.out.print("Size: " + td.children().size() + " ");
+        for (Node child : td.childNodes()) {
+            // String childText = child.text();
+
+            System.out.print(child.toString() + " | ");
+
+            // if (child.tagName().equals("hr")) {
+            //     System.out.print("Found ----hr---- | ");
+            // } else if (childText.contains("→") || childText.contains("↓")) {
+            //     System.out.print("Found -> | ");
+            // } else if (childText.contains("←")) {
+            //     System.out.print("Found <- | ");
+            // } else {
+            //     System.out.print("Found Nothing | ");
+            //     currSec.add(child);
+            // }
         }
 
         //Get Other/description if applicable
 
-        return finalList;
+
+        // System.out.print(" ] ");
+        // return finalList;
+        return null;
     }
 
     //Will transpose a tbodys

@@ -4,7 +4,9 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.moss.poke.scraper.AllPokeFromSite;
 import com.moss.poke.scraper.PokeFromSite;
@@ -28,9 +30,9 @@ public class App
         // pokemon = "Tapu Lele";
         // pokemon = "Mr. Mime";
 
-        // allPoke = new ArrayList<>();
+        allPoke = new ArrayList<>();
         // allPoke.add("Tapu Lele");
-        // allPoke.add("Mr. Mime");
+        allPoke.add("Mr. Mime");
         // allPoke.add("Mime Jr.");
         // allPoke.add("Grapploct");
         // allPoke.add("Calyrex");
@@ -38,7 +40,7 @@ public class App
         // allPoke.add("Regidrago");
         // allPoke.add("Oddish");
         // allPoke.add("Gloom");
-        // allPoke.add("Eevee");
+        allPoke.add("Eevee");
         // allPoke.add("Urshifu");
         // allPoke.add("Wurmple");
         // allPoke.add("Tyrogue");
@@ -50,6 +52,7 @@ public class App
         // allPoke.add("Electivire");
 
         PokeFromSite poke = null;
+        System.out.println("");
 
         for (String p : allPoke) {
             try {
@@ -88,10 +91,13 @@ public class App
             System.out.print(" | ");
             System.out.print(poke.getBaseFriendship());
 
+            // Set<String> hs = poke.getNextEvo();
+            // if (hs != null)
+            //     allSpecialEvoReq.addAll(hs);
             System.out.println("");
             poke.getNextEvo();
-            // System.out.print(" | ");
-            // System.out.print(poke.getNextEvo());
+            System.out.println("");
+            System.out.println("");
         }
 
         // Pokemon a = new Pokemon();
